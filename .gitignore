@@ -101,6 +101,7 @@ celerybeat-schedule.*
 .env
 .venv
 env/
+!static/
 venv/
 ENV/
 env.bak/
