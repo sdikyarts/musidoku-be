@@ -16,5 +16,6 @@
       "src": "/(.*)",
       "dest": "musidoku_project/wsgi.py"
     }
-  ]
+  ],
+  "outputDirectory": "static"
 }
