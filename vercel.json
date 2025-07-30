@@ -5,23 +5,16 @@
       "src": "musidoku_project/wsgi.py",
       "use": "@vercel/python",
       "config": {"maxLambdaSize": "15mb", "runtime": "python3.x"}
-    },
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles"
-      }
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "musidoku_project/wsgi.py"
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "src": "/(.*)",
+      "dest": "musidoku_project/wsgi.py"
     }
   ]
 }
