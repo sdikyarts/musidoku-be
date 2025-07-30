@@ -3,7 +3,7 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/staticfiles/$1"
+      "dest": "/public/$1"
     },
     {
       "src": "/(.*)",
