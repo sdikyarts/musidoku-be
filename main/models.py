@@ -1,8 +1,10 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+import uuid
 
 # Create your models here.
 class Artists(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ARTIST_TYPES = [
         ("Solo", "Solo"),
         ("Group", "Group"),
@@ -83,6 +85,7 @@ class Artists(models.Model):
     debut_year = models.PositiveIntegerField(
         validators=[MinValueValidator(1900), MaxValueValidator(2100)]
     )
+    spotify_id = models.CharField(max_length=22)
     spotify_primary_genre = models.CharField(max_length=100)
     image = models.URLField(blank=True, null=True)
     uses_stage_name = models.BooleanField(blank=True, null=True)
@@ -112,10 +115,11 @@ class Artists(models.Model):
         return genre
 
 class Labels(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)
     parent_company = models.CharField(max_length=255, blank=True, null=True)
     founded_year = models.IntegerField(blank=True, null=True)
-    country = models.CharField(max_length=100, blank=True, null=True)
+    country = models.CharField(max_length=2, blank=True, null=True)
     is_major = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -124,6 +128,7 @@ class Labels(models.Model):
         return self.name
     
 class ArtistLabels(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     artist = models.ForeignKey(Artists, on_delete=models.CASCADE, related_name='label_relationships')
     label = models.ForeignKey(Labels, on_delete=models.CASCADE, related_name='artist_relationships')
     is_primary = models.BooleanField(default=False)
@@ -135,6 +140,7 @@ class ArtistLabels(models.Model):
     
         
 class Albums(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     primary_artist = models.ForeignKey(Artists, on_delete=models.CASCADE, related_name='albums')
     title = models.CharField(max_length=255)
     release_date = models.DateField(blank=True, null=True)
@@ -150,6 +156,7 @@ class Albums(models.Model):
         return self.title
     
 class AlbumCollabs(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     album = models.ForeignKey(Albums, on_delete=models.CASCADE, related_name='collabs')
     collab_artist_id = models.ForeignKey(Artists, on_delete=models.CASCADE, related_name='collab_albums')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -160,6 +167,7 @@ class AlbumCollabs(models.Model):
 
 
 class Categories(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     CATEGORY_TYPES = [
         ("geographic", "Geographic"),
         ("temporal", "Temporal"),
@@ -170,6 +178,7 @@ class Categories(models.Model):
         ("other", "Other"),
     ]
     
+    code = models.CharField(max_length=50, unique=True)
     display_name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     category_type = models.CharField(max_length=20, choices=CATEGORY_TYPES)
@@ -187,6 +196,7 @@ class Categories(models.Model):
         return self.display_name
 
 class Puzzle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     puzzle_date = models.DateField(unique=True)
     category_row_1 = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name='row1_puzzles')
     category_row_2 = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name='row2_puzzles')
@@ -213,6 +223,7 @@ class Puzzle(models.Model):
         return f"Puzzle for {self.puzzle_date}"
     
 class GameSubmission(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_id = models.CharField(max_length=255)
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE, related_name='submissions')
     cell_index = models.CharField(max_length=10)  # '1,1', '1,2', etc.
