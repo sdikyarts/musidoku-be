@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-import uuid
+from django.utils.text import slugify
+import uuid, re
 
 # Create your models here.
 class Artists(models.Model):
@@ -95,6 +96,7 @@ class Artists(models.Model):
     is_disbanded = models.BooleanField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=255, unique=True, editable=False, blank=True, null=True)
     
     class Meta:
         verbose_name = "Artist"
@@ -103,6 +105,28 @@ class Artists(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def clean_slug(self, name):
+        name = re.sub(r'[^\w\s-]', '', name)
+        return slugify(name)
+
+    def get_disambiguator(self):
+        return self.origin_country or str(self.debut_year)
+
+    def save(self, *args, **kwargs):
+        if not self.slug or self.name != Artists.objects.filter(pk=self.pk).first().name if self.pk else None:
+            base_slug = self.clean_slug(self.name)
+            slug = base_slug
+            counter = 1
+            while Artists.objects.filter(slug__iexact=slug).exclude(pk=self.pk).exists():
+                # For LISA vs LiSA, append disambiguator (country, etc.)
+                disambiguator = self.get_disambiguator(self)
+                slug = f"{base_slug}-{disambiguator.lower()}"
+                if Artists.objects.filter(slug__iexact=slug).exclude(pk=self.pk).exists():
+                    slug = f"{base_slug}-{disambiguator.lower()}-{counter}"
+                    counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
     
     @property
     def normalized_genre(self):
