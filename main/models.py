@@ -228,6 +228,10 @@ class Labels(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        verbose_name = "Label"
+        verbose_name_plural = "Labels"
+    
     def __str__(self):
         return self.name
     
@@ -255,6 +259,10 @@ class Albums(models.Model):
     image = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Album"
+        verbose_name_plural = "Albums"
 
     def __str__(self):
         return self.title
@@ -323,6 +331,10 @@ class Puzzle(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
+    class Meta:
+        verbose_name = "Puzzle"
+        verbose_name_plural = "Puzzles"
+    
     def __str__(self):
         return f"Puzzle for {self.puzzle_date}"
     
@@ -336,6 +348,8 @@ class GameSubmission(models.Model):
     
     class Meta:
         unique_together = ['user_id', 'puzzle', 'selected_artist']  # Prevent repetition
+        verbose_name = "Game Submission"
+        verbose_name_plural = "Game Submissions"
     
     def __str__(self):
         return f"{self.user_id} - {self.puzzle.puzzle_date} - {self.cell_index}"
