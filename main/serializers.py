@@ -6,8 +6,8 @@ class ArtistSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Artists
-        fields = ['id', 'name', 'artist_type', 'origin_country', 'debut_year', 
-                  'spotify_id', 'spotify_primary_genre', 'normalized_genre',
+        fields = ['id', 'roster_number', 'name', 'artist_type', 'origin_country', 'debut_year', 
+                  'spotify_id', 'spotify_primary_genre', 'normalized_genre', 'image',
                   'uses_stage_name', 'has_grammy_win', 'has_hot100_entry', 'is_deceased', 'is_disbanded']
         
 class CategorySerializer(serializers.ModelSerializer):

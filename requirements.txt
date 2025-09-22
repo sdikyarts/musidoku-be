@@ -7,3 +7,4 @@ urllib3
 django-environ
 djangorestframework
 django-cors-headers
+spotipy

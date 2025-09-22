@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/today-puzzle/', TodayPuzzleView.as_view(), name='today-puzzle'),
     path('api/validate-guess/', ValidateGuessView.as_view(), name='validate-guess'),
     path('api/user-submissions/<int:user_id>/<int:puzzle_id>/', UserSubmissionsView.as_view(), name='user-submissions'),
+    path('api/spotify-auth/', SpotifyAuthURLView.as_view(), name='spotify-auth'),
 ]

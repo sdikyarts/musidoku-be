@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -6,6 +7,9 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
+from django.http import HttpResponse
+from spotipy import SpotifyOAuth
+import spotipy
 from .models import Artists, Categories, Puzzle, GameSubmission
 from .serializers import (
     ArtistSerializer, CategorySerializer, PuzzleSerializer, 
@@ -14,14 +18,24 @@ from .serializers import (
 
 from .logic import GameValidator, PuzzleManager
 
-# Helper functions to get row and column categories for a puzzle
+sp_oauth = SpotifyOAuth(
+    client_id=settings.SPOTIPY_CLIENT_ID,
+    client_secret=settings.SPOTIPY_CLIENT_SECRET,
+    redirect_uri=settings.SPOTIPY_REDIRECT_URI,
+    scope="user-library-read"
+)
+
 def get_row_categories(puzzle):
     return [puzzle.category_row_1, puzzle.category_row_2, puzzle.category_row_3]
 
 def get_column_categories(puzzle):
     return [puzzle.category_column_1, puzzle.category_column_2, puzzle.category_column_3]
 
-# Create your views here.
+class SpotifyAuthURLView(APIView):
+    def get(self, request):
+        auth_url = sp_oauth.get_authorize_url()
+        return Response({'auth_url': auth_url})
+    
 class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Artists.objects.all()
     serializer_class = ArtistSerializer
