@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
 import uuid, re
+from .constants import GENRE_MAPPING
 
 # Create your models here.
 class Artists(models.Model):
@@ -11,74 +12,7 @@ class Artists(models.Model):
         ("Group", "Group"),
     ]
     
-    GENRE_MAPPING = {
-        'Rap': 'Hip-Hop',
-        'Pop': 'Pop',
-        'Reggaeton': 'Latin',
-        'Soft Pop': 'Pop',
-        'Hip Hop': 'Hip-Hop',
-        'Alternative': 'Alternative',
-        'K-pop': ['K-Pop', 'Pop'],
-        'Melodic Rap': 'Hip-Hop',
-        'Hip-hop': 'Hip-Hop',
-        'R&b': 'R&B',
-        'Emo Rap': 'Hip-Hop',
-        'Edm': 'Electronic',
-        'R&B': 'R&B',
-        'Art Pop': 'Pop',
-        'Classic Rock': 'Rock',
-        'Latin Pop': 'Latin',
-        'Nu Metal': 'Rock',
-        'Trap Soul': 'R&B',
-        'Hindi Pop': 'Bollywood',
-        'Corrido': 'Latin',
-        'Indie': 'Alternative',
-        'Country': 'Country',
-        'Electronic': 'Electronic',
-        'Bollywood': 'Bollywood',
-        'Rage Rap': 'Hip-Hop',
-        'Corridos Tumbados': 'Latin',
-        'G-funk': 'Hip-Hop',
-        'Tropical House': 'Electronic',
-        'Funk Rock': 'Rock',
-        'East Coast Hip Hop': 'Hip-Hop',
-        'Rock': 'Rock',
-        'Bachata': 'Latin',
-        'Brooklyn Drill': 'Hip-Hop',
-        'Metal': 'Metal',
-        'Moombahton': 'Electronic',
-        'Trap': 'Hip-Hop',
-        'French House': 'Electronic',
-        'Dancehall': 'Reggae',
-        'Mariachi': 'Latin',
-        'Chicago Drill': 'Hip-Hop',
-        'Southern Hip Hop': 'Hip-Hop',
-        'Argentine Trap': 'Latin',
-        'Sertanejo': 'Latin',
-        'Emo': 'Rock',
-        'Banda': 'Latin',
-        'Brazilian Pop': 'Latin',
-        'Colombian Pop': 'Latin',
-        'Singer-songwriter': 'Alternative',
-        'Soul / Motown R&B': 'R&B',
-        'Christian Hip Hop': 'Hip-Hop',
-        'Old School Hip Hop': 'Hip-Hop',
-        'Christmas': 'Pop',
-        'French Rap': 'Hip-Hop',
-        'Tamil Pop': 'Bollywood',
-        'Grunge': 'Rock',
-        'Punk': 'Rock',
-        'Hyperpop': 'Pop',
-        'Neo-psychedelic': 'Alternative',
-        'Dubstep': 'Electronic',
-        'Art Rock': 'Rock',
-        'Progressive Rock': 'Rock',
-        'Urbano Latino': 'Latin',
-        'Cumbia Norteña': 'Latin',
-        'Rockabilly': 'Rock',
-        'Latin': 'Latin',
-        'Dream Pop': 'Alternative',
-    }
+
     
     name = models.CharField(max_length=255)
     artist_type = models.CharField(max_length=10, choices=ARTIST_TYPES)
@@ -133,7 +67,7 @@ class Artists(models.Model):
             self.slug = slug
         
         # Auto-assign roster number for new artists
-        if not self.roster_number and not self.pk:
+        if self.roster_number is None and self.pk is None:
             # Get the highest existing roster number and add 1
             max_roster = Artists.objects.aggregate(
                 max_roster=models.Max('roster_number')
@@ -211,8 +145,8 @@ class Artists(models.Model):
     @property
     def normalized_genre(self):
         genre = self.spotify_primary_genre
-        if genre in self.GENRE_MAPPING:
-            mapped_genre = self.GENRE_MAPPING[genre]
+        if genre in GENRE_MAPPING:
+            mapped_genre = GENRE_MAPPING[genre]
             if isinstance(mapped_genre, list):
                 return mapped_genre[0]
             return mapped_genre
